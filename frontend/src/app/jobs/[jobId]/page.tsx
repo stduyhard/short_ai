@@ -1,16 +1,7 @@
 import React from "react";
 import { JobStageList } from "../../../components/job-stage-list";
 import { VideoPreview } from "../../../components/video-preview";
-import type { JobDetail } from "../../../lib/types";
-
-const defaultStages: JobDetail["stages"] = [
-  { key: "director", label: "创意策划", status: "pending" },
-  { key: "script", label: "文案生成", status: "pending" },
-  { key: "storyboard", label: "分镜生成", status: "pending" },
-  { key: "visual", label: "视觉素材生成", status: "pending" },
-  { key: "voice", label: "配音与字幕生成", status: "pending" },
-  { key: "editor", label: "视频渲染", status: "pending" },
-];
+import { fetchJobDetail } from "../../../lib/api";
 
 type JobDetailPageProps = {
   params: Promise<{
@@ -20,12 +11,16 @@ type JobDetailPageProps = {
 
 export default async function JobDetailPage({ params }: JobDetailPageProps) {
   const { jobId } = await params;
+  const job = await fetchJobDetail(jobId);
 
   return (
     <main>
       <h1>任务详情</h1>
-      <p>任务 ID：{jobId}</p>
-      <JobStageList stages={defaultStages} />
+      <p>任务 ID：{job.jobId}</p>
+      <p>主题：{job.topic}</p>
+      <p>风格：{job.style}</p>
+      <p>状态：{job.status}</p>
+      <JobStageList stages={job.stages} />
       <VideoPreview />
     </main>
   );

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import type { CreateJobInput } from "../lib/types";
 
 type JobFormProps = {
-  onSubmit?: (value: CreateJobInput) => void;
+  onSubmit?: (value: CreateJobInput) => void | Promise<void>;
 };
 
 export function JobForm({ onSubmit }: JobFormProps) {
