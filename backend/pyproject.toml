@@ -6,16 +6,19 @@ dependencies = [
   "fastapi>=0.115.0",
   "uvicorn>=0.30.0",
   "pydantic>=2.8.0",
-  "langgraph>=0.2.0",
-  "httpx>=0.27.0",
 ]
 
 [project.optional-dependencies]
 dev = [
+  "httpx>=0.27.0",
   "pytest>=8.3.0",
   "ruff>=0.6.0",
   "mypy>=1.11.0",
 ]
+workflow = [
+  "langgraph>=0.2.0",
+]
 
 [tool.mypy]
 explicit_package_bases = true
+mypy_path = "backend"

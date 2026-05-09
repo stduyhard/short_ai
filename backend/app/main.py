@@ -2,8 +2,8 @@ from uuid import uuid4
 
 from fastapi import FastAPI
 
-from .core.config import settings
-from .core.models import CreateJobRequest, JobResponse
+from app.core.config import settings
+from app.core.models import CreateJobRequest, JobResponse
 
 
 app = FastAPI(title=settings.app_name)
