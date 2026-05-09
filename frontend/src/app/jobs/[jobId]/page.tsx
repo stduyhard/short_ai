@@ -1,7 +1,8 @@
 import React from "react";
+import { AudioPreview } from "../../../components/audio-preview";
 import { JobStageList } from "../../../components/job-stage-list";
 import { VideoPreview } from "../../../components/video-preview";
-import { fetchJobDetail } from "../../../lib/api";
+import { fetchJobDetail, toPublicArtifactUrl } from "../../../lib/api";
 
 type JobDetailPageProps = {
   params: Promise<{
@@ -53,7 +54,16 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
         {job.visualAssets?.length ? (
           <ul>
             {job.visualAssets.map((asset) => (
-              <li key={asset}>{asset}</li>
+              <li key={asset}>
+                {toPublicArtifactUrl(asset) ? (
+                  <img
+                    src={toPublicArtifactUrl(asset) ?? undefined}
+                    alt="生成视觉素材"
+                    style={{ maxWidth: 240, display: "block", marginBottom: 8 }}
+                  />
+                ) : null}
+                <span>{asset}</span>
+              </li>
             ))}
           </ul>
         ) : (
@@ -63,7 +73,10 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
 
       <section>
         <h2>配音音频</h2>
-        <p>{job.voiceAsset ?? "暂未生成"}</p>
+        <AudioPreview
+          src={job.voiceAsset ? (toPublicArtifactUrl(job.voiceAsset) ?? job.voiceAsset) : undefined}
+        />
+        {job.voiceAsset ? <p>原始路径：{job.voiceAsset}</p> : null}
       </section>
 
       <section>

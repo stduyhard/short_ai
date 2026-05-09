@@ -36,3 +36,27 @@ export async function fetchJobDetail(jobId: string): Promise<JobDetail> {
 
   return (await response.json()) as JobDetail;
 }
+
+export function toPublicArtifactUrl(assetPath: string): string | null {
+  if (!assetPath) {
+    return null;
+  }
+
+  const normalized = assetPath.replaceAll("\\", "/");
+  const marker = "/artifacts/";
+  const markerIndex = normalized.lastIndexOf(marker);
+
+  if (normalized.startsWith("artifacts/")) {
+    return `${API_BASE_URL}/${normalized}`;
+  }
+
+  if (markerIndex >= 0) {
+    return `${API_BASE_URL}${normalized.slice(markerIndex)}`;
+  }
+
+  if (/^https?:\/\//.test(normalized)) {
+    return normalized;
+  }
+
+  return null;
+}
