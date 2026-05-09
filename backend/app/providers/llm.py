@@ -40,3 +40,13 @@ class OpenAILLMProvider:
             input=request.prompt,
         )
         return LLMResponse(content=response.output_text, provider_name=self.provider_name)
+
+
+class StubLLMProvider:
+    provider_name = "stub"
+
+    def generate(self, request: LLMRequest) -> LLMResponse:
+        return LLMResponse(
+            content=f"stub::{request.metadata.get('purpose', 'text')}::{request.prompt[:80]}",
+            provider_name=self.provider_name,
+        )

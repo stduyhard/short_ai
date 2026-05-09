@@ -55,26 +55,39 @@ class JobService:
         for stage in job.stages:
             stage.status = "pending"
 
-        workflow_result = self._workflow.invoke(
-            {
-                "topic": job.topic,
-                "style": job.style,
-                "stages": [],
-                "brief": "",
-                "script": "",
-                "storyboard": [],
-                "visual_assets": [],
-                "voice_asset": "",
-                "final_video": "",
-                "final_status": "running",
-            }
-        )
+        try:
+            workflow_result = self._workflow.invoke(
+                {
+                    "job_id": job.jobId,
+                    "topic": job.topic,
+                    "style": job.style,
+                    "stages": [],
+                    "brief": "",
+                    "script": "",
+                    "storyboard": [],
+                    "visual_assets": [],
+                    "voice_asset": "",
+                    "final_video": "",
+                    "final_status": "running",
+                }
+            )
+        except Exception as exc:
+            job.status = "failed"
+            job.errorMessage = str(exc)
+            return job
         completed_stages = set(workflow_result.get("stages", []))
 
         for stage in job.stages:
             stage.status = "completed" if stage.key in completed_stages else "pending"
 
         job.status = workflow_result.get("final_status", "completed")
+        job.brief = workflow_result.get("brief")
+        job.script = workflow_result.get("script")
+        job.storyboard = workflow_result.get("storyboard")
+        job.visualAssets = workflow_result.get("visual_assets")
+        job.voiceAsset = workflow_result.get("voice_asset")
+        job.finalVideo = workflow_result.get("final_video")
+        job.errorMessage = None
         return job
 
     def retry_stage(self, job_id: str, stage_key: str) -> dict[str, str] | None:

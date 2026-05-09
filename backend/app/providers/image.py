@@ -73,3 +73,22 @@ class OpenAIImageProvider:
             raise ValueError("OpenAI image generation returned neither b64_json nor url")
 
         return ImageResponse(asset_uri=image.url, provider_name=self.provider_name)
+
+
+class StubImageProvider:
+    provider_name = "stub"
+
+    def __init__(self, storage_provider: StorageProvider) -> None:
+        self._storage_provider = storage_provider
+
+    def generate(self, request: ImageRequest) -> ImageResponse:
+        job_id = request.metadata.get("job_id", "adhoc")
+        stored = self._storage_provider.save_bytes(
+            path=f"images/{job_id}/generated.png",
+            content=base64.b64decode(
+                "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9sXl16sAAAAASUVORK5CYII="
+            ),
+            content_type="image/png",
+            metadata={"provider": self.provider_name},
+        )
+        return ImageResponse(asset_uri=stored.path, provider_name=self.provider_name)

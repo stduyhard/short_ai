@@ -51,3 +51,18 @@ class OpenAITTSProvider:
             response.stream_to_file(speech_path)
 
         return TTSResponse(asset_uri=str(speech_path), provider_name=self.provider_name)
+
+
+class StubTTSProvider:
+    provider_name = "stub"
+
+    def __init__(self, output_dir: Path) -> None:
+        self._output_dir = output_dir
+        self._output_dir.mkdir(parents=True, exist_ok=True)
+
+    def synthesize(self, request: TTSRequest) -> TTSResponse:
+        job_id = request.metadata.get("job_id", "adhoc")
+        speech_path = self._output_dir / "audio" / job_id / "voice.mp3"
+        speech_path.parent.mkdir(parents=True, exist_ok=True)
+        speech_path.write_bytes(b"stub-mp3")
+        return TTSResponse(asset_uri=str(speech_path), provider_name=self.provider_name)

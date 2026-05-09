@@ -51,6 +51,13 @@ def test_get_job_detail_returns_created_job_with_default_stages() -> None:
             {"key": "voice", "label": "配音与字幕生成", "status": "pending"},
             {"key": "editor", "label": "视频渲染", "status": "pending"},
         ],
+        "brief": None,
+        "script": None,
+        "storyboard": None,
+        "visualAssets": None,
+        "voiceAsset": None,
+        "finalVideo": None,
+        "errorMessage": None,
     }
 
 
@@ -87,3 +94,9 @@ def test_run_job_executes_workflow_and_updates_job_state() -> None:
         {"key": "voice", "label": "配音与字幕生成", "status": "completed"},
         {"key": "editor", "label": "视频渲染", "status": "completed"},
     ]
+    assert detail_response.json()["brief"]
+    assert detail_response.json()["script"]
+    assert detail_response.json()["storyboard"]
+    assert detail_response.json()["visualAssets"]
+    assert detail_response.json()["voiceAsset"].endswith(".mp3")
+    assert detail_response.json()["finalVideo"].endswith(".mp4")

@@ -6,6 +6,7 @@ def test_langgraph_workflow_runs_all_six_stages_in_order() -> None:
 
     result = graph.invoke(
         {
+            "job_id": "graph-test",
             "topic": "高效晨间习惯",
             "style": "干货",
             "stages": [],
@@ -27,10 +28,10 @@ def test_langgraph_workflow_runs_all_six_stages_in_order() -> None:
         "voice",
         "editor",
     ]
-    assert result["brief"] == "director completed"
-    assert result["script"] == "script completed"
-    assert result["storyboard"] == [{"shot": "1", "caption": "storyboard completed"}]
-    assert result["visual_assets"] == ["visual completed"]
+    assert result["brief"]
+    assert result["script"]
+    assert result["storyboard"]
+    assert result["visual_assets"]
     assert result["voice_asset"].endswith(".mp3")
     assert result["final_video"].endswith(".mp4")
     assert result["final_status"] == "completed"

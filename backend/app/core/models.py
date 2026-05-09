@@ -25,3 +25,10 @@ class JobDetailResponse(BaseModel):
     style: str
     status: str
     stages: list[JobStageResponse]
+    brief: str | None = None
+    script: str | None = None
+    storyboard: list[dict[str, str]] | None = None
+    visualAssets: list[str] | None = None
+    voiceAsset: str | None = None
+    finalVideo: str | None = None
+    errorMessage: str | None = None

@@ -2,6 +2,7 @@ from typing import TypedDict
 
 
 class WorkflowState(TypedDict):
+    job_id: str
     topic: str
     style: str
     stages: list[str]

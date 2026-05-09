@@ -24,9 +24,16 @@ class RenderResult:
 
 
 class Renderer:
-    def __init__(self, *, ffmpeg_binary: str = "ffmpeg", work_dir: Path | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        ffmpeg_binary: str = "ffmpeg",
+        work_dir: Path | None = None,
+        allow_placeholder_when_unavailable: bool = False,
+    ) -> None:
         self._ffmpeg_binary = ffmpeg_binary
         self._work_dir = work_dir or Path("artifacts")
+        self._allow_placeholder_when_unavailable = allow_placeholder_when_unavailable
         self._work_dir.mkdir(parents=True, exist_ok=True)
 
     def render(self, request: RenderRequest) -> RenderResult:
@@ -77,6 +84,11 @@ class Renderer:
                 text=True,
             )
         except FileNotFoundError as exc:
+            if self._allow_placeholder_when_unavailable:
+                manifest["warning"] = (
+                    f"FFmpeg binary not found: {self._ffmpeg_binary}. Returned placeholder render result."
+                )
+                return RenderResult(status="completed", video_path=str(video_path), manifest=manifest)
             raise FileNotFoundError(
                 f"FFmpeg binary not found: {self._ffmpeg_binary}. Set FFMPEG_BINARY or install ffmpeg."
             ) from exc
