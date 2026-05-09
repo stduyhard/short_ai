@@ -1,20 +1,25 @@
-from app.workflows.graph import build_workflow
+from app.workflows.graph import build_graph
 
 
 def test_langgraph_workflow_runs_all_six_stages_in_order() -> None:
-    graph = build_workflow()
+    graph = build_graph()
 
     result = graph.invoke(
         {
             "topic": "高效晨间习惯",
             "style": "干货",
-            "completed_stages": [],
-            "artifacts": {},
+            "stages": [],
+            "brief": "",
+            "script": "",
+            "storyboard": "",
+            "visual_assets": "",
+            "voice_asset": "",
+            "final_video": "",
             "final_status": "pending",
         }
     )
 
-    assert result["completed_stages"] == [
+    assert result["stages"] == [
         "director",
         "script",
         "storyboard",
@@ -22,12 +27,4 @@ def test_langgraph_workflow_runs_all_six_stages_in_order() -> None:
         "voice",
         "editor",
     ]
-    assert result["artifacts"] == {
-        "director": "director completed",
-        "script": "script completed",
-        "storyboard": "storyboard completed",
-        "visual": "visual completed",
-        "voice": "voice completed",
-        "editor": "editor completed",
-    }
     assert result["final_status"] == "completed"

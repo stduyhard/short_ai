@@ -9,7 +9,7 @@ from app.agents.voice import run_voice
 from app.workflows.state import WorkflowState
 
 
-def build_workflow():
+def build_graph():
     graph_builder = StateGraph(WorkflowState)
 
     graph_builder.add_node("director", run_director)

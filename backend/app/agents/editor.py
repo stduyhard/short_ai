@@ -1,5 +1,10 @@
-from app.workflows.state import WorkflowState, build_stage_update
+from app.workflows.state import WorkflowState
 
 
 def run_editor(state: WorkflowState) -> WorkflowState:
-    return build_stage_update(state, "editor")
+    return {
+        **state,
+        "stages": [*state["stages"], "editor"],
+        "final_video": "editor completed",
+        "final_status": "completed",
+    }

@@ -1,5 +1,10 @@
-from app.workflows.state import WorkflowState, build_stage_update
+from app.workflows.state import WorkflowState
 
 
 def run_director(state: WorkflowState) -> WorkflowState:
-    return build_stage_update(state, "director")
+    return {
+        **state,
+        "stages": [*state["stages"], "director"],
+        "brief": "director completed",
+        "final_status": "running",
+    }

@@ -1,5 +1,10 @@
-from app.workflows.state import WorkflowState, build_stage_update
+from app.workflows.state import WorkflowState
 
 
 def run_visual(state: WorkflowState) -> WorkflowState:
-    return build_stage_update(state, "visual")
+    return {
+        **state,
+        "stages": [*state["stages"], "visual"],
+        "visual_assets": "visual completed",
+        "final_status": "running",
+    }

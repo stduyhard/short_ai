@@ -1,5 +1,10 @@
-from app.workflows.state import WorkflowState, build_stage_update
+from app.workflows.state import WorkflowState
 
 
 def run_voice(state: WorkflowState) -> WorkflowState:
-    return build_stage_update(state, "voice")
+    return {
+        **state,
+        "stages": [*state["stages"], "voice"],
+        "voice_asset": "voice completed",
+        "final_status": "running",
+    }

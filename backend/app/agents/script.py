@@ -1,5 +1,10 @@
-from app.workflows.state import WorkflowState, build_stage_update
+from app.workflows.state import WorkflowState
 
 
 def run_script(state: WorkflowState) -> WorkflowState:
-    return build_stage_update(state, "script")
+    return {
+        **state,
+        "stages": [*state["stages"], "script"],
+        "script": "script completed",
+        "final_status": "running",
+    }
