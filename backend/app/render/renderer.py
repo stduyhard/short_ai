@@ -95,6 +95,10 @@ class Renderer:
 
         manifest["ffmpeg_stdout"] = completed.stdout
         manifest["ffmpeg_stderr"] = completed.stderr
+        if not video_path.exists():
+            raise RuntimeError(
+                f"FFmpeg command completed successfully but did not produce an output file: {video_path}"
+            )
         return RenderResult(status="completed", video_path=str(video_path), manifest=manifest)
 
     @staticmethod

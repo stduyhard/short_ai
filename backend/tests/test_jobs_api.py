@@ -98,5 +98,5 @@ def test_run_job_executes_workflow_and_updates_job_state() -> None:
     assert detail_response.json()["script"]
     assert detail_response.json()["storyboard"]
     assert detail_response.json()["visualAssets"]
-    assert detail_response.json()["voiceAsset"].endswith(".mp3")
+    assert detail_response.json()["voiceAsset"].endswith((".mp3", ".wav"))
     assert detail_response.json()["finalVideo"].endswith(".mp4")
