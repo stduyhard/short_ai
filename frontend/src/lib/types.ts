@@ -13,6 +13,16 @@ export type JobDetail = {
   style: string;
   status: StageStatus;
   stages: JobStage[];
+  brief?: string | null;
+  script?: string | null;
+  storyboard?: Array<{
+    shot: string;
+    caption: string;
+  }> | null;
+  visualAssets?: string[] | null;
+  voiceAsset?: string | null;
+  finalVideo?: string | null;
+  errorMessage?: string | null;
   previewUrl?: string;
   finalVideoUrl?: string;
 };
