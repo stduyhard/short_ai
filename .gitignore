@@ -1,0 +1,17 @@
+node_modules/
+.next/
+dist/
+coverage/
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.pyc
+.env
+.env.*
+backend/.env
+frontend/.env.local
+tmp/
+artifacts/
+.superpowers/
