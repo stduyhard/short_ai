@@ -1,3 +1,4 @@
+from app.render.renderer import RenderRequest, Renderer
 from app.workflows.graph import build_graph
 
 
@@ -34,3 +35,21 @@ def test_langgraph_workflow_runs_all_six_stages_in_order() -> None:
     assert result["voice_asset"] == "voice completed"
     assert result["final_video"] == "editor completed"
     assert result["final_status"] == "completed"
+
+    render_result = Renderer().render(
+        RenderRequest(
+            job_id="job-task-8",
+            topic=result["topic"],
+            script=result["script"],
+            storyboard=result["storyboard"],
+            visual_assets=result["visual_assets"],
+            voice_asset=result["voice_asset"],
+        )
+    )
+
+    assert render_result.status == "queued"
+    assert render_result.video_path == "renders/job-task-8/final.mp4"
+    assert render_result.manifest["script"] == result["script"]
+    assert render_result.manifest["storyboard"] == result["storyboard"]
+    assert render_result.manifest["visual_assets"] == result["visual_assets"]
+    assert render_result.manifest["voice_asset"] == result["voice_asset"]
