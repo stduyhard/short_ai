@@ -11,3 +11,12 @@ class JobResponse(BaseModel):
     topic: str
     style: str
     status: str
+
+
+class JobStageResponse(BaseModel):
+    name: str
+    status: str
+
+
+class JobDetailResponse(JobResponse):
+    stages: list[JobStageResponse]
