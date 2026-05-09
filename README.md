@@ -89,3 +89,12 @@ python -m pytest backend/tests
 Set-Location .\frontend
 npm test
 ```
+
+如需把联调脚本本身也纳入验收，补充执行：
+
+```powershell
+$tokens = $null
+$errors = $null
+[void][System.Management.Automation.Language.Parser]::ParseFile('D:\short_video\scripts\dev.ps1', [ref]$tokens, [ref]$errors)
+if ($errors.Count -gt 0) { exit 1 }
+```
