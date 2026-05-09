@@ -3,13 +3,13 @@ from uuid import uuid4
 from app.core.models import CreateJobRequest, JobDetailResponse, JobResponse, JobStageResponse
 
 
-DEFAULT_STAGE_NAMES = [
-    "idea_generation",
-    "outline",
-    "script",
-    "storyboard",
-    "voiceover",
-    "render",
+DEFAULT_STAGES = [
+    {"key": "director", "label": "Director"},
+    {"key": "script", "label": "Script"},
+    {"key": "storyboard", "label": "Storyboard"},
+    {"key": "visual", "label": "Visual"},
+    {"key": "voice", "label": "Voice"},
+    {"key": "editor", "label": "Editor"},
 ]
 
 
@@ -20,18 +20,22 @@ class JobService:
     def create_job(self, payload: CreateJobRequest) -> JobResponse:
         job_id = str(uuid4())
         job = JobDetailResponse(
-            job_id=job_id,
+            jobId=job_id,
             topic=payload.topic,
             style=payload.style,
             status="pending",
             stages=[
-                JobStageResponse(name=stage_name, status="pending")
-                for stage_name in DEFAULT_STAGE_NAMES
+                JobStageResponse(
+                    key=stage["key"],
+                    label=stage["label"],
+                    status="pending",
+                )
+                for stage in DEFAULT_STAGES
             ],
         )
         self._jobs[job_id] = job
         return JobResponse(
-            job_id=job.job_id,
+            job_id=job.jobId,
             topic=job.topic,
             style=job.style,
             status=job.status,

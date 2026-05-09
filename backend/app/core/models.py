@@ -14,9 +14,14 @@ class JobResponse(BaseModel):
 
 
 class JobStageResponse(BaseModel):
-    name: str
+    key: str
+    label: str
     status: str
 
 
-class JobDetailResponse(JobResponse):
+class JobDetailResponse(BaseModel):
+    jobId: str
+    topic: str
+    style: str
+    status: str
     stages: list[JobStageResponse]

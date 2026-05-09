@@ -39,16 +39,23 @@ def test_get_job_detail_returns_created_job_with_default_stages() -> None:
 
     assert detail_response.status_code == 200
     assert detail_response.json() == {
-        "job_id": job_id,
+        "jobId": job_id,
         "topic": "番茄工作法",
         "style": "干货",
         "status": "pending",
         "stages": [
-            {"name": "idea_generation", "status": "pending"},
-            {"name": "outline", "status": "pending"},
-            {"name": "script", "status": "pending"},
-            {"name": "storyboard", "status": "pending"},
-            {"name": "voiceover", "status": "pending"},
-            {"name": "render", "status": "pending"},
+            {"key": "director", "label": "Director", "status": "pending"},
+            {"key": "script", "label": "Script", "status": "pending"},
+            {"key": "storyboard", "label": "Storyboard", "status": "pending"},
+            {"key": "visual", "label": "Visual", "status": "pending"},
+            {"key": "voice", "label": "Voice", "status": "pending"},
+            {"key": "editor", "label": "Editor", "status": "pending"},
         ],
     }
+
+
+def test_get_job_detail_returns_404_when_job_missing() -> None:
+    response = client.get("/api/jobs/missing-job-id")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Job not found"}
