@@ -59,3 +59,31 @@ def test_get_job_detail_returns_404_when_job_missing() -> None:
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Job not found"}
+
+
+def test_run_job_executes_workflow_and_updates_job_state() -> None:
+    create_response = client.post(
+        "/api/jobs",
+        json={"topic": "AI 口播", "style": "教程"},
+    )
+
+    assert create_response.status_code == 201
+    job_id = create_response.json()["job_id"]
+
+    run_response = client.post(f"/api/jobs/{job_id}/run")
+
+    assert run_response.status_code == 202
+    assert run_response.json() == {"jobId": job_id, "status": "completed"}
+
+    detail_response = client.get(f"/api/jobs/{job_id}")
+
+    assert detail_response.status_code == 200
+    assert detail_response.json()["status"] == "completed"
+    assert detail_response.json()["stages"] == [
+        {"key": "director", "label": "创意策划", "status": "completed"},
+        {"key": "script", "label": "文案生成", "status": "completed"},
+        {"key": "storyboard", "label": "分镜生成", "status": "completed"},
+        {"key": "visual", "label": "视觉素材生成", "status": "completed"},
+        {"key": "voice", "label": "配音与字幕生成", "status": "completed"},
+        {"key": "editor", "label": "视频渲染", "status": "completed"},
+    ]
