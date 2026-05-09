@@ -44,12 +44,12 @@ def test_get_job_detail_returns_created_job_with_default_stages() -> None:
         "style": "干货",
         "status": "pending",
         "stages": [
-            {"key": "director", "label": "Director", "status": "pending"},
-            {"key": "script", "label": "Script", "status": "pending"},
-            {"key": "storyboard", "label": "Storyboard", "status": "pending"},
-            {"key": "visual", "label": "Visual", "status": "pending"},
-            {"key": "voice", "label": "Voice", "status": "pending"},
-            {"key": "editor", "label": "Editor", "status": "pending"},
+            {"key": "director", "label": "创意策划", "status": "pending"},
+            {"key": "script", "label": "文案生成", "status": "pending"},
+            {"key": "storyboard", "label": "分镜生成", "status": "pending"},
+            {"key": "visual", "label": "视觉素材生成", "status": "pending"},
+            {"key": "voice", "label": "配音与字幕生成", "status": "pending"},
+            {"key": "editor", "label": "视频渲染", "status": "pending"},
         ],
     }
 

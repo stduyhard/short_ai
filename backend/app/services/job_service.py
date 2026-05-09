@@ -4,12 +4,12 @@ from app.core.models import CreateJobRequest, JobDetailResponse, JobResponse, Jo
 
 
 DEFAULT_STAGES = [
-    {"key": "director", "label": "Director"},
-    {"key": "script", "label": "Script"},
-    {"key": "storyboard", "label": "Storyboard"},
-    {"key": "visual", "label": "Visual"},
-    {"key": "voice", "label": "Voice"},
-    {"key": "editor", "label": "Editor"},
+    {"key": "director", "label": "创意策划"},
+    {"key": "script", "label": "文案生成"},
+    {"key": "storyboard", "label": "分镜生成"},
+    {"key": "visual", "label": "视觉素材生成"},
+    {"key": "voice", "label": "配音与字幕生成"},
+    {"key": "editor", "label": "视频渲染"},
 ]
 
 
