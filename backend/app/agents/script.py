@@ -6,5 +6,4 @@ def run_script(state: WorkflowState) -> WorkflowState:
         **state,
         "stages": [*state["stages"], "script"],
         "script": "script completed",
-        "final_status": "running",
     }

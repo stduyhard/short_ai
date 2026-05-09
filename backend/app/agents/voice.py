@@ -6,5 +6,4 @@ def run_voice(state: WorkflowState) -> WorkflowState:
         **state,
         "stages": [*state["stages"], "voice"],
         "voice_asset": "voice completed",
-        "final_status": "running",
     }

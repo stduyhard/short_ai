@@ -7,8 +7,8 @@ class WorkflowState(TypedDict):
     stages: list[str]
     brief: str
     script: str
-    storyboard: str
-    visual_assets: str
+    storyboard: list[dict[str, str]]
+    visual_assets: list[str]
     voice_asset: str
     final_video: str
     final_status: str

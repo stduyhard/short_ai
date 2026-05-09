@@ -6,5 +6,4 @@ def run_director(state: WorkflowState) -> WorkflowState:
         **state,
         "stages": [*state["stages"], "director"],
         "brief": "director completed",
-        "final_status": "running",
     }
