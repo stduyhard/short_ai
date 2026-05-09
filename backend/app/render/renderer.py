@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping
 
-from app.providers.storage import StorageProvider
-
 
 @dataclass(slots=True, frozen=True)
 class RenderRequest:
@@ -24,9 +22,6 @@ class RenderResult:
 
 
 class Renderer:
-    def __init__(self, storage_provider: StorageProvider | None = None) -> None:
-        self._storage_provider = storage_provider
-
     def render(self, request: RenderRequest) -> RenderResult:
         self._validate_request(request)
 
@@ -40,14 +35,6 @@ class Renderer:
             "voice_asset": request.voice_asset,
             "video_path": video_path,
         }
-
-        if self._storage_provider is not None:
-            self._storage_provider.save_text(
-                path=f"renders/{request.job_id}/manifest.json",
-                content=str(manifest),
-                content_type="application/json",
-                metadata={"job_id": request.job_id, "artifact": "render_manifest"},
-            )
 
         return RenderResult(status="queued", video_path=video_path, manifest=manifest)
 

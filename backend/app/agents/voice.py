@@ -5,5 +5,5 @@ def run_voice(state: WorkflowState) -> WorkflowState:
     return {
         **state,
         "stages": [*state["stages"], "voice"],
-        "voice_asset": "voice completed",
+        "voice_asset": "artifacts/voice.mp3",
     }
