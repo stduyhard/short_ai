@@ -18,7 +18,7 @@ def build_editor_node(renderer: Renderer):
             **state,
             "stages": [*state["stages"], "editor"],
             "final_video": result.video_path,
-            "final_status": "completed",
+            "final_status": result.status,
         }
 
     return run_editor

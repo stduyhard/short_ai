@@ -80,12 +80,12 @@ def test_run_job_executes_workflow_and_updates_job_state() -> None:
     run_response = client.post(f"/api/jobs/{job_id}/run")
 
     assert run_response.status_code == 202
-    assert run_response.json() == {"jobId": job_id, "status": "completed"}
+    assert run_response.json() == {"jobId": job_id, "status": "degraded"}
 
     detail_response = client.get(f"/api/jobs/{job_id}")
 
     assert detail_response.status_code == 200
-    assert detail_response.json()["status"] == "completed"
+    assert detail_response.json()["status"] == "degraded"
     assert detail_response.json()["stages"] == [
         {"key": "director", "label": "创意策划", "status": "completed"},
         {"key": "script", "label": "文案生成", "status": "completed"},
@@ -99,4 +99,4 @@ def test_run_job_executes_workflow_and_updates_job_state() -> None:
     assert detail_response.json()["storyboard"]
     assert detail_response.json()["visualAssets"]
     assert detail_response.json()["voiceAsset"].endswith((".mp3", ".wav"))
-    assert detail_response.json()["finalVideo"].endswith(".mp4")
+    assert detail_response.json()["finalVideo"] == ""

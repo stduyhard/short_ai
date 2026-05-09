@@ -1,4 +1,5 @@
 export type StageStatus = "pending" | "running" | "completed" | "failed";
+export type JobStatus = StageStatus | "degraded";
 
 export type JobStage = {
   key: string;
@@ -11,7 +12,7 @@ export type JobDetail = {
   jobId: string;
   topic: string;
   style: string;
-  status: StageStatus;
+  status: JobStatus;
   stages: JobStage[];
   brief?: string | null;
   script?: string | null;

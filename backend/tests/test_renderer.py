@@ -34,6 +34,21 @@ def test_renderer_raises_when_ffmpeg_does_not_create_output(tmp_path: Path) -> N
         renderer.render(request)
 
 
+def test_renderer_returns_degraded_result_when_placeholder_mode_is_enabled(tmp_path: Path) -> None:
+    request = _build_render_request(tmp_path)
+    renderer = Renderer(
+        ffmpeg_binary="ffmpeg-missing",
+        work_dir=tmp_path,
+        allow_placeholder_when_unavailable=True,
+    )
+
+    result = renderer.render(request)
+
+    assert result.status == "degraded"
+    assert result.video_path == ""
+    assert result.manifest["placeholder"] is True
+
+
 def _build_fake_ffmpeg(tmp_path: Path, *, mode: str) -> Path:
     script_path = tmp_path / f"fake_ffmpeg_{mode}.py"
     script_path.write_text(

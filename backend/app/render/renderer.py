@@ -65,7 +65,7 @@ class Renderer:
             "-shortest",
             str(video_path),
         ]
-        manifest = {
+        manifest: dict[str, object] = {
             "job_id": request.job_id,
             "topic": request.topic,
             "script": request.script,
@@ -85,10 +85,11 @@ class Renderer:
             )
         except FileNotFoundError as exc:
             if self._allow_placeholder_when_unavailable:
+                manifest["placeholder"] = True
                 manifest["warning"] = (
                     f"FFmpeg binary not found: {self._ffmpeg_binary}. Returned placeholder render result."
                 )
-                return RenderResult(status="completed", video_path=str(video_path), manifest=manifest)
+                return RenderResult(status="degraded", video_path="", manifest=manifest)
             raise FileNotFoundError(
                 f"FFmpeg binary not found: {self._ffmpeg_binary}. Set FFMPEG_BINARY or install ffmpeg."
             ) from exc
