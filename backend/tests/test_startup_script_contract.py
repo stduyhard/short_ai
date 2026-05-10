@@ -10,3 +10,4 @@ def test_windows_startup_wrapper_invokes_dev_powershell_script() -> None:
 
     assert "dev.ps1" in content
     assert "powershell" in content.lower()
+    assert "Frontend URL:" in content
