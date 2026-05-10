@@ -26,6 +26,10 @@ class JobService:
             topic=payload.topic,
             style=payload.style,
             voiceSelection=payload.voice,
+            duration=payload.duration,
+            shotCount=payload.shotCount,
+            subtitlesEnabled=payload.subtitlesEnabled,
+            aspectRatio="9:16",
             status="pending",
             stages=[
                 JobStageResponse(
@@ -42,6 +46,10 @@ class JobService:
             topic=job.topic,
             style=job.style,
             voice=job.voiceSelection,
+            duration=job.duration,
+            shotCount=job.shotCount,
+            subtitlesEnabled=job.subtitlesEnabled,
+            aspectRatio=job.aspectRatio,
             status=job.status,
         )
 

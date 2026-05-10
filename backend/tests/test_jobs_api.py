@@ -71,6 +71,33 @@ def test_create_job() -> None:
     assert response.json()["status"] == "pending"
 
 
+def test_create_job_persists_generation_controls() -> None:
+    response = client.post(
+        "/api/jobs",
+        json={
+            "topic": "时间管理",
+            "style": "励志",
+            "voice": "Chelsie",
+            "duration": 60,
+            "shotCount": 7,
+            "subtitlesEnabled": False,
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.json()["status"] == "pending"
+
+    job_id = response.json()["job_id"]
+    detail_response = client.get(f"/api/jobs/{job_id}")
+
+    assert detail_response.status_code == 200
+    assert detail_response.json()["duration"] == 60
+    assert detail_response.json()["shotCount"] == 7
+    assert detail_response.json()["subtitlesEnabled"] is False
+    assert detail_response.json()["aspectRatio"] == "9:16"
+    assert detail_response.json()["voiceSelection"] == "Chelsie"
+
+
 def test_get_job_detail_returns_created_job_with_default_stages() -> None:
     create_response = client.post(
         "/api/jobs",
@@ -87,6 +114,10 @@ def test_get_job_detail_returns_created_job_with_default_stages() -> None:
         "jobId": job_id,
         "topic": "番茄工作法",
         "style": "干货",
+        "duration": 30,
+        "shotCount": 5,
+        "subtitlesEnabled": True,
+        "aspectRatio": "9:16",
         "status": "pending",
         "stages": [
             {"key": "director", "label": "创意策划", "status": "pending"},
