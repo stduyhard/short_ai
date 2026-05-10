@@ -136,6 +136,20 @@ powershell -ExecutionPolicy Bypass -File .\scripts\check-real-generation-readine
 4. `POST /api/jobs/{jobId}/run`
 5. `GET /api/jobs/{jobId}` 查看 `status`、`voiceAsset`、`finalVideo`
 
+如果你想直接一键跑这条链路，可以使用：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run-qwen-smoke.ps1
+```
+
+这个脚本会：
+
+- 先检查 `/api/runtime/readiness`
+- 创建一个测试任务
+- 调用 `/api/jobs/{jobId}/run`
+- 轮询任务详情直到结束
+- 输出 `jobId`、`status`、`voiceSelection`、`voiceAsset`、`finalVideo`
+
 如果当前环境还没装好，后端会返回 `degraded`，这表示工作流已跑通，但真实成片依赖还未满足。
 
 ## 验收命令
