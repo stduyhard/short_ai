@@ -14,6 +14,8 @@ class RenderRequest:
     storyboard: list[dict[str, str]]
     visual_assets: list[str]
     voice_asset: str
+    subtitles_enabled: bool
+    aspect_ratio: str
 
 
 @dataclass(slots=True, frozen=True)
@@ -72,6 +74,8 @@ class Renderer:
             "storyboard": request.storyboard,
             "visual_assets": request.visual_assets,
             "voice_asset": request.voice_asset,
+            "subtitles_enabled": request.subtitles_enabled,
+            "aspect_ratio": request.aspect_ratio,
             "video_path": str(video_path),
             "ffmpeg_command": command,
         }

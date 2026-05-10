@@ -12,6 +12,8 @@ def build_editor_node(renderer: Renderer):
                 storyboard=state["storyboard"],
                 visual_assets=state["visual_assets"],
                 voice_asset=state["voice_asset"],
+                subtitles_enabled=state["subtitles_enabled"],
+                aspect_ratio=state["aspect_ratio"],
             )
         )
         return {

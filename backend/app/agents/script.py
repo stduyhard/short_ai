@@ -6,7 +6,10 @@ def build_script_node(llm_provider: LLMProvider):
     def run_script(state: WorkflowState) -> WorkflowState:
         response = llm_provider.generate(
             LLMRequest(
-                prompt=f"根据这个创意 brief 生成 30-60 秒中文口播文案：{state['brief']}",
+                prompt=(
+                    f"根据这个创意 brief 生成约 {state['duration']} 秒的中文口播文案，"
+                    f"保持{state['style']}风格：{state['brief']}"
+                ),
                 metadata={"purpose": "script", "job_id": state["job_id"]},
             )
         )

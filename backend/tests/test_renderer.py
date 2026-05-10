@@ -99,4 +99,6 @@ def _build_render_request(tmp_path: Path) -> RenderRequest:
         storyboard=[{"shot": "1", "caption": "占位镜头"}],
         visual_assets=[str(image_path)],
         voice_asset=str(voice_path),
+        subtitles_enabled=True,
+        aspect_ratio="9:16",
     )

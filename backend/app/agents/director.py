@@ -6,7 +6,10 @@ def build_director_node(llm_provider: LLMProvider):
     def run_director(state: WorkflowState) -> WorkflowState:
         response = llm_provider.generate(
             LLMRequest(
-                prompt=f"为主题“{state['topic']}”生成一个{state['style']}风格的短视频创意 brief。",
+                prompt=(
+                    f"为主题“{state['topic']}”生成一个{state['style']}风格的短视频创意 brief，"
+                    f"目标时长约 {state['duration']} 秒，画幅为 {state['aspect_ratio']}。"
+                ),
                 metadata={"purpose": "brief", "job_id": state["job_id"]},
             )
         )

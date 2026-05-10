@@ -72,6 +72,10 @@ class JobService:
                     "topic": job.topic,
                     "style": job.style,
                     "voice_selection": job.voiceSelection,
+                    "duration": job.duration,
+                    "shot_count": job.shotCount,
+                    "subtitles_enabled": job.subtitlesEnabled,
+                    "aspect_ratio": job.aspectRatio,
                     "stages": [],
                     "brief": "",
                     "script": "",
@@ -98,6 +102,10 @@ class JobService:
         job.visualAssets = workflow_result.get("visual_assets")
         job.voiceAsset = workflow_result.get("voice_asset")
         job.finalVideo = workflow_result.get("final_video")
+        job.duration = workflow_result.get("duration", job.duration)
+        job.shotCount = workflow_result.get("shot_count", job.shotCount)
+        job.subtitlesEnabled = workflow_result.get("subtitles_enabled", job.subtitlesEnabled)
+        job.aspectRatio = workflow_result.get("aspect_ratio", job.aspectRatio)
         job.errorMessage = None
         return job
 

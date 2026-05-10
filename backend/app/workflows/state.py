@@ -6,6 +6,10 @@ class WorkflowState(TypedDict):
     topic: str
     style: str
     voice_selection: str
+    duration: int
+    shot_count: int
+    subtitles_enabled: bool
+    aspect_ratio: str
     stages: list[str]
     brief: str
     script: str
