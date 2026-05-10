@@ -33,3 +33,8 @@ export type CreateJobInput = {
   style: string;
   voice: string;
 };
+
+export type VoiceOption = {
+  value: string;
+  label: string;
+};

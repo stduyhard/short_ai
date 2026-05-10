@@ -1,13 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import type { CreateJobInput } from "../lib/types";
+import type { CreateJobInput, VoiceOption } from "../lib/types";
 
 type JobFormProps = {
   onSubmit?: (value: CreateJobInput) => void | Promise<void>;
+  voiceOptions?: VoiceOption[];
 };
 
-export function JobForm({ onSubmit }: JobFormProps) {
+const DEFAULT_VOICE_OPTIONS: VoiceOption[] = [
+  { value: "auto", label: "自动匹配" },
+  { value: "Chelsie", label: "Chelsie" },
+  { value: "Serena", label: "Serena" },
+  { value: "Ethan", label: "Ethan" },
+  { value: "Dylan", label: "Dylan" },
+];
+
+export function JobForm({ onSubmit, voiceOptions = DEFAULT_VOICE_OPTIONS }: JobFormProps) {
   const [topic, setTopic] = useState("");
   const [style, setStyle] = useState("");
   const [voice, setVoice] = useState("auto");
@@ -40,11 +49,11 @@ export function JobForm({ onSubmit }: JobFormProps) {
         value={voice}
         onChange={(event) => setVoice(event.target.value)}
       >
-        <option value="auto">自动匹配</option>
-        <option value="Chelsie">Chelsie</option>
-        <option value="Serena">Serena</option>
-        <option value="Ethan">Ethan</option>
-        <option value="Dylan">Dylan</option>
+        {voiceOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </select>
       <button type="submit">开始生成</button>
     </form>

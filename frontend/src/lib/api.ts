@@ -1,4 +1,4 @@
-import type { CreateJobInput, JobDetail } from "./types";
+import type { CreateJobInput, JobDetail, VoiceOption } from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
 
@@ -35,6 +35,24 @@ export async function fetchJobDetail(jobId: string): Promise<JobDetail> {
   }
 
   return (await response.json()) as JobDetail;
+}
+
+type VoiceCatalogResponse = {
+  provider: string;
+  model: string;
+  voices: VoiceOption[];
+};
+
+export async function fetchVoiceOptions(): Promise<VoiceOption[]> {
+  const response = await fetch(`${API_BASE_URL}/api/voices`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch voice options");
+  }
+
+  return ((await response.json()) as VoiceCatalogResponse).voices;
 }
 
 export function toPublicArtifactUrl(assetPath: string): string | null {

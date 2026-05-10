@@ -40,6 +40,23 @@ def test_healthcheck() -> None:
     assert response.json() == {"status": "ok"}
 
 
+def test_list_available_voices() -> None:
+    response = client.get("/api/voices")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "provider": "stub",
+        "model": "qwen3-tts-flash",
+        "voices": [
+            {"value": "auto", "label": "自动匹配"},
+            {"value": "Chelsie", "label": "Chelsie"},
+            {"value": "Serena", "label": "Serena"},
+            {"value": "Ethan", "label": "Ethan"},
+            {"value": "Dylan", "label": "Dylan"},
+        ],
+    }
+
+
 def test_create_job() -> None:
     response = client.post(
         "/api/jobs",

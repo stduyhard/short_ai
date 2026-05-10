@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.core.models import CreateJobRequest, JobDetailResponse, JobResponse
 from app.services.job_service import JobService
 from app.services.runtime_readiness import inspect_runtime_readiness
+from app.services.voice_catalog import list_available_voices
 
 
 app = FastAPI(title=settings.app_name)
@@ -47,6 +48,11 @@ def healthcheck() -> dict[str, str]:
 @app.get("/api/runtime/readiness")
 def get_runtime_readiness() -> dict[str, bool]:
     return inspect_runtime_readiness(settings).to_response()
+
+
+@app.get("/api/voices")
+def get_available_voices() -> dict[str, object]:
+    return list_available_voices(settings)
 
 
 @app.post("/api/jobs", response_model=JobResponse, status_code=201)
