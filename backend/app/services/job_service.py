@@ -25,6 +25,7 @@ class JobService:
             jobId=job_id,
             topic=payload.topic,
             style=payload.style,
+            voiceSelection=payload.voice,
             status="pending",
             stages=[
                 JobStageResponse(
@@ -40,6 +41,7 @@ class JobService:
             job_id=job.jobId,
             topic=job.topic,
             style=job.style,
+            voice=job.voiceSelection,
             status=job.status,
         )
 
@@ -61,6 +63,7 @@ class JobService:
                     "job_id": job.jobId,
                     "topic": job.topic,
                     "style": job.style,
+                    "voice_selection": job.voiceSelection,
                     "stages": [],
                     "brief": "",
                     "script": "",

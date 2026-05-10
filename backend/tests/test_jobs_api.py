@@ -1,9 +1,36 @@
 from fastapi.testclient import TestClient
+import pytest
 
+import app.main as main_module
 from app.main import app
+from app.services.job_service import JobService
 
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def reset_job_service() -> None:
+    original_settings = {
+        "llm_provider": main_module.settings.llm_provider,
+        "image_provider": main_module.settings.image_provider,
+        "tts_provider": main_module.settings.tts_provider,
+        "dashscope_api_key": main_module.settings.dashscope_api_key,
+        "openai_api_key": main_module.settings.openai_api_key,
+    }
+    main_module.settings.llm_provider = "stub"
+    main_module.settings.image_provider = "stub"
+    main_module.settings.tts_provider = "stub"
+    main_module.settings.dashscope_api_key = None
+    main_module.settings.openai_api_key = None
+    main_module.job_service = JobService()
+    yield
+    main_module.settings.llm_provider = original_settings["llm_provider"]
+    main_module.settings.image_provider = original_settings["image_provider"]
+    main_module.settings.tts_provider = original_settings["tts_provider"]
+    main_module.settings.dashscope_api_key = original_settings["dashscope_api_key"]
+    main_module.settings.openai_api_key = original_settings["openai_api_key"]
+    main_module.job_service = JobService()
 
 
 def test_healthcheck() -> None:
@@ -16,13 +43,14 @@ def test_healthcheck() -> None:
 def test_create_job() -> None:
     response = client.post(
         "/api/jobs",
-        json={"topic": "时间管理", "style": "励志"},
+        json={"topic": "时间管理", "style": "励志", "voice": "Chelsie"},
     )
 
     assert response.status_code == 201
     assert response.json()["job_id"]
     assert response.json()["topic"] == "时间管理"
     assert response.json()["style"] == "励志"
+    assert response.json()["voice"] == "Chelsie"
     assert response.json()["status"] == "pending"
 
 
@@ -58,6 +86,7 @@ def test_get_job_detail_returns_created_job_with_default_stages() -> None:
         "voiceAsset": None,
         "finalVideo": None,
         "errorMessage": None,
+        "voiceSelection": "auto",
     }
 
 
@@ -71,7 +100,7 @@ def test_get_job_detail_returns_404_when_job_missing() -> None:
 def test_run_job_executes_workflow_and_updates_job_state() -> None:
     create_response = client.post(
         "/api/jobs",
-        json={"topic": "AI 口播", "style": "教程"},
+        json={"topic": "AI 口播", "style": "教程", "voice": "Chelsie"},
     )
 
     assert create_response.status_code == 201
@@ -100,3 +129,4 @@ def test_run_job_executes_workflow_and_updates_job_state() -> None:
     assert detail_response.json()["visualAssets"]
     assert detail_response.json()["voiceAsset"].endswith((".mp3", ".wav"))
     assert detail_response.json()["finalVideo"] == ""
+    assert detail_response.json()["voiceSelection"] == "Chelsie"

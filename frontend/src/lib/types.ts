@@ -31,4 +31,5 @@ export type JobDetail = {
 export type CreateJobInput = {
   topic: string;
   style: string;
+  voice: string;
 };

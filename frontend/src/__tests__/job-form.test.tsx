@@ -33,10 +33,12 @@ describe("JobForm", () => {
 
     expect(screen.getByLabelText("主题")).toBeInTheDocument();
     expect(screen.getByLabelText("风格")).toBeInTheDocument();
+    expect(screen.getByLabelText("音色")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("自动匹配")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "开始生成" })).toBeInTheDocument();
   });
 
-  it("submits topic and style values", () => {
+  it("submits topic and style values with auto voice by default", () => {
     const handleSubmit = vi.fn();
 
     render(<JobForm onSubmit={handleSubmit} />);
@@ -52,6 +54,30 @@ describe("JobForm", () => {
     expect(handleSubmit).toHaveBeenCalledWith({
       topic: "春节旅行攻略",
       style: "轻松口播",
+      voice: "auto",
+    });
+  });
+
+  it("submits a manually selected voice", () => {
+    const handleSubmit = vi.fn();
+
+    render(<JobForm onSubmit={handleSubmit} />);
+
+    fireEvent.change(screen.getByLabelText("主题"), {
+      target: { value: "春节旅行攻略" },
+    });
+    fireEvent.change(screen.getByLabelText("风格"), {
+      target: { value: "轻松口播" },
+    });
+    fireEvent.change(screen.getByLabelText("音色"), {
+      target: { value: "Chelsie" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "开始生成" }));
+
+    expect(handleSubmit).toHaveBeenCalledWith({
+      topic: "春节旅行攻略",
+      style: "轻松口播",
+      voice: "Chelsie",
     });
   });
 
@@ -77,6 +103,7 @@ describe("JobForm", () => {
       expect(createJob).toHaveBeenCalledWith({
         topic: "春节旅行攻略",
         style: "轻松口播",
+        voice: "auto",
       });
     });
 

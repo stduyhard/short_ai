@@ -5,6 +5,7 @@ class WorkflowState(TypedDict):
     job_id: str
     topic: str
     style: str
+    voice_selection: str
     stages: list[str]
     brief: str
     script: str
