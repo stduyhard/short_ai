@@ -80,6 +80,48 @@ powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1 -BackendPort 8001 -FrontendPort 3001
 ```
 
+## 真实出片准备
+
+要走真实 `OpenAI + ffmpeg` 出片链路，当前项目至少需要满足这两项：
+
+- 设置 `OPENAI_API_KEY`
+- 安装 `ffmpeg`，或把 `FFMPEG_BINARY` 指向现有可执行文件
+
+PowerShell 示例：
+
+```powershell
+$env:OPENAI_API_KEY = "sk-..."
+$env:FFMPEG_BINARY = "ffmpeg"
+```
+
+如果你已经启动了后端，可以直接检查运行时就绪度：
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/api/runtime/readiness
+```
+
+也可以使用仓库自带脚本做本地检查：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\check-real-generation-readiness.ps1
+```
+
+当返回里这三个值都满足时，就可以继续做第一次真实出片验证：
+
+- `openaiConfigured = true`
+- `ffmpegAvailable = true`
+- `readyForRealGeneration = true`
+
+一个最小验证流程是：
+
+1. 启动后端 `uvicorn`
+2. 启动前端或直接调用创建任务接口
+3. `POST /api/jobs`
+4. `POST /api/jobs/{jobId}/run`
+5. `GET /api/jobs/{jobId}` 查看 `status`、`voiceAsset`、`finalVideo`
+
+如果当前环境还没装好，后端会返回 `degraded`，这表示工作流已跑通，但真实成片依赖还未满足。
+
 ## 验收命令
 
 按 Task 10 的本地验收方式，在仓库根目录执行：

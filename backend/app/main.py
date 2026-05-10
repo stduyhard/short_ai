@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from app.core.config import settings
 from app.core.models import CreateJobRequest, JobDetailResponse, JobResponse
 from app.services.job_service import JobService
+from app.services.runtime_readiness import inspect_runtime_readiness
 
 
 app = FastAPI(title=settings.app_name)
@@ -41,6 +42,14 @@ class JobRetryResponse(BaseModel):
 @app.get("/health")
 def healthcheck() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/api/runtime/readiness")
+def get_runtime_readiness() -> dict[str, bool]:
+    return inspect_runtime_readiness(
+        openai_api_key=settings.openai_api_key,
+        ffmpeg_binary=settings.ffmpeg_binary,
+    ).to_response()
 
 
 @app.post("/api/jobs", response_model=JobResponse, status_code=201)
