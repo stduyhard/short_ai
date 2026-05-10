@@ -68,6 +68,12 @@ npm test
 powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1
 ```
 
+如果你想用更符合 Windows 使用习惯的启动方式，也可以直接运行：
+
+```bat
+.\scripts\start-dev.cmd
+```
+
 这个脚本会：
 
 - 在新 PowerShell 窗口启动后端 `uvicorn`
