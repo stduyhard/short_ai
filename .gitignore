@@ -11,6 +11,7 @@ __pycache__/
 *.pyc
 .env
 .env.*
+!backend/.env.example
 backend/.env
 frontend/.env.local
 tmp/

@@ -87,7 +87,17 @@ powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1 -BackendPort 8001 -Fr
 - 设置 `OPENAI_API_KEY`
 - 安装 `ffmpeg`，或把 `FFMPEG_BINARY` 指向现有可执行文件
 
-PowerShell 示例：
+项目现在支持专门的后端配置文件：`backend/.env`。
+
+你可以先从 [backend/.env.example](D:/short_video/backend/.env.example) 复制一份：
+
+```powershell
+Copy-Item .\backend\.env.example .\backend\.env
+```
+
+然后把真实值填进去。环境变量仍然有效，并且优先级高于 `backend/.env`。
+
+只想临时覆盖时，也可以继续用环境变量。PowerShell 示例：
 
 ```powershell
 $env:OPENAI_API_KEY = "sk-..."
