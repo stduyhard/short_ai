@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import base64
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Literal, Mapping, Protocol
 
+import httpx
 from openai import OpenAI
 
 from app.providers.storage import StorageProvider
@@ -92,3 +94,66 @@ class StubImageProvider:
             metadata={"provider": self.provider_name},
         )
         return ImageResponse(asset_uri=stored.path, provider_name=self.provider_name)
+
+
+class QwenImageProvider:
+    provider_name = "qwen"
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        model: str,
+        base_url: str,
+        storage_provider: StorageProvider,
+    ) -> None:
+        self._api_key = api_key
+        self._model = model
+        self._base_url = base_url.rstrip("/")
+        self._storage_provider = storage_provider
+
+    def generate(self, request: ImageRequest) -> ImageResponse:
+        response = httpx.post(
+            f"{self._base_url}/services/aigc/text2image/image-synthesis",
+            headers={
+                "Authorization": f"Bearer {self._api_key}",
+                "Content-Type": "application/json",
+                "X-DashScope-Async": "false",
+            },
+            json={
+                "model": self._model,
+                "input": {"prompt": request.prompt},
+                "parameters": {"size": request.size},
+            },
+            timeout=120.0,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        image_url = _extract_qwen_image_url(payload)
+        image_response = httpx.get(image_url, timeout=120.0)
+        image_response.raise_for_status()
+        job_id = request.metadata.get("job_id", "adhoc")
+        target_name = Path(image_url).name or "generated.png"
+        stored = self._storage_provider.save_bytes(
+            path=f"images/{job_id}/{target_name}",
+            content=image_response.content,
+            content_type=image_response.headers.get("content-type", "image/png"),
+            metadata={"provider": self.provider_name},
+        )
+        return ImageResponse(asset_uri=stored.path, provider_name=self.provider_name)
+
+
+def _extract_qwen_image_url(payload: Mapping[str, object]) -> str:
+    output = payload.get("output")
+    if not isinstance(output, Mapping):
+        raise ValueError("Qwen image generation returned no output payload")
+
+    results = output.get("results")
+    if isinstance(results, list) and results:
+        first = results[0]
+        if isinstance(first, Mapping):
+            url = first.get("url")
+            if isinstance(url, str) and url:
+                return url
+
+    raise ValueError("Qwen image generation returned no image URL")

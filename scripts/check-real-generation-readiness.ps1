@@ -4,6 +4,7 @@ param(
 
 $readiness = [ordered]@{
     OpenAIKeyConfigured = [bool]$env:OPENAI_API_KEY
+    DashScopeKeyConfigured = [bool]$env:DASHSCOPE_API_KEY
     FfmpegOnPath = [bool](Get-Command ffmpeg -ErrorAction SilentlyContinue)
     BackendReachable = $false
     BackendReportedReady = $false
@@ -13,7 +14,7 @@ try {
     $response = Invoke-RestMethod -Uri "$BackendUrl/api/runtime/readiness" -Method Get -TimeoutSec 5
     $readiness.BackendReachable = $true
     $readiness.BackendReportedReady = [bool]$response.readyForRealGeneration
-    $readiness.BackendOpenAIConfigured = [bool]$response.openaiConfigured
+    $readiness.BackendProvidersConfigured = [bool]$response.providersConfigured
     $readiness.BackendFfmpegAvailable = [bool]$response.ffmpegAvailable
 }
 catch {
@@ -22,8 +23,8 @@ catch {
 
 $readiness
 
-if (-not $readiness.OpenAIKeyConfigured) {
-    Write-Warning "OPENAI_API_KEY is not configured."
+if (-not $readiness.OpenAIKeyConfigured -and -not $readiness.DashScopeKeyConfigured) {
+    Write-Warning "Neither OPENAI_API_KEY nor DASHSCOPE_API_KEY is configured."
 }
 
 if (-not $readiness.FfmpegOnPath) {

@@ -46,10 +46,7 @@ def healthcheck() -> dict[str, str]:
 
 @app.get("/api/runtime/readiness")
 def get_runtime_readiness() -> dict[str, bool]:
-    return inspect_runtime_readiness(
-        openai_api_key=settings.openai_api_key,
-        ffmpeg_binary=settings.ffmpeg_binary,
-    ).to_response()
+    return inspect_runtime_readiness(settings).to_response()
 
 
 @app.post("/api/jobs", response_model=JobResponse, status_code=201)

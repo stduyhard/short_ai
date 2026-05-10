@@ -29,9 +29,10 @@ class LLMProvider(Protocol):
 class OpenAILLMProvider:
     provider_name = "openai"
 
-    def __init__(self, *, api_key: str, model: str) -> None:
-        self._client = OpenAI(api_key=api_key)
+    def __init__(self, *, api_key: str, model: str, base_url: str | None = None, provider_name: str = "openai") -> None:
+        self._client = OpenAI(api_key=api_key, base_url=base_url)
         self._model = model
+        self.provider_name = provider_name
 
     def generate(self, request: LLMRequest) -> LLMResponse:
         response = self._client.responses.create(
@@ -50,3 +51,10 @@ class StubLLMProvider:
             content=f"stub::{request.metadata.get('purpose', 'text')}::{request.prompt[:80]}",
             provider_name=self.provider_name,
         )
+
+
+class QwenLLMProvider(OpenAILLMProvider):
+    provider_name = "qwen"
+
+    def __init__(self, *, api_key: str, model: str, base_url: str) -> None:
+        super().__init__(api_key=api_key, model=model, base_url=base_url, provider_name=self.provider_name)

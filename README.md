@@ -82,9 +82,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1 -BackendPort 8001 -Fr
 
 ## 真实出片准备
 
-要走真实 `OpenAI + ffmpeg` 出片链路，当前项目至少需要满足这两项：
+要走真实出片链路，当前项目至少需要满足这两项：
 
-- 设置 `OPENAI_API_KEY`
+- 配好至少一组真实 provider 的密钥
 - 安装 `ffmpeg`，或把 `FFMPEG_BINARY` 指向现有可执行文件
 
 项目现在支持专门的后端配置文件：`backend/.env`。
@@ -97,10 +97,16 @@ Copy-Item .\backend\.env.example .\backend\.env
 
 然后把真实值填进去。环境变量仍然有效，并且优先级高于 `backend/.env`。
 
-只想临时覆盖时，也可以继续用环境变量。PowerShell 示例：
+当前默认推荐配置是 `Qwen + ffmpeg`。只想临时覆盖时，也可以继续用环境变量。PowerShell 示例：
 
 ```powershell
-$env:OPENAI_API_KEY = "sk-..."
+$env:DASHSCOPE_API_KEY = "sk-..."
+$env:LLM_PROVIDER = "qwen"
+$env:IMAGE_PROVIDER = "qwen"
+$env:TTS_PROVIDER = "qwen"
+$env:LLM_MODEL = "qwen-plus-latest"
+$env:IMAGE_MODEL = "qwen-image-2.0"
+$env:TTS_MODEL = "qwen3-tts-flash"
 $env:FFMPEG_BINARY = "ffmpeg"
 ```
 
@@ -118,7 +124,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\check-real-generation-readine
 
 当返回里这三个值都满足时，就可以继续做第一次真实出片验证：
 
-- `openaiConfigured = true`
+- `providersConfigured = true`
 - `ffmpegAvailable = true`
 - `readyForRealGeneration = true`
 
