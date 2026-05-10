@@ -3,31 +3,31 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { JobForm } from "../components/job-form";
-import { createJob, fetchVoiceOptions } from "../lib/api";
-import type { CreateJobInput, VoiceOption } from "../lib/types";
+import { createJob, fetchVoiceCatalog } from "../lib/api";
+import type { CreateJobInput, VoiceCatalog } from "../lib/types";
 
 export default function HomePage() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [voiceOptions, setVoiceOptions] = useState<VoiceOption[] | undefined>(undefined);
+  const [voiceCatalog, setVoiceCatalog] = useState<VoiceCatalog | null>(null);
 
   useEffect(() => {
     let active = true;
 
-    async function loadVoiceOptions() {
+    async function loadVoiceCatalog() {
       try {
-        const options = await fetchVoiceOptions();
+        const catalog = await fetchVoiceCatalog();
         if (active) {
-          setVoiceOptions(options);
+          setVoiceCatalog(catalog);
         }
       } catch {
         if (active) {
-          setVoiceOptions(undefined);
+          setVoiceCatalog(null);
         }
       }
     }
 
-    void loadVoiceOptions();
+    void loadVoiceCatalog();
 
     return () => {
       active = false;
@@ -48,7 +48,8 @@ export default function HomePage() {
   return (
     <main>
       <h1>AI 短视频生成</h1>
-      <JobForm onSubmit={handleSubmit} voiceOptions={voiceOptions} />
+      {voiceCatalog ? <p>当前音色目录：{voiceCatalog.provider} / {voiceCatalog.model}</p> : null}
+      <JobForm onSubmit={handleSubmit} voiceOptions={voiceCatalog?.voices} />
       {submitError ? <p role="alert">{submitError}</p> : null}
     </main>
   );

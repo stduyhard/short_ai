@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import HomePage from "../app/page";
 import { JobForm } from "../components/job-form";
-import { createJob } from "../lib/api";
+import { createJob, fetchVoiceCatalog } from "../lib/api";
 
 const pushMock = vi.fn();
 
@@ -16,6 +16,7 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("../lib/api", () => ({
   createJob: vi.fn(),
+  fetchVoiceCatalog: vi.fn(),
 }));
 
 afterEach(() => {
@@ -25,6 +26,15 @@ afterEach(() => {
 beforeEach(() => {
   pushMock.mockReset();
   vi.mocked(createJob).mockReset();
+  vi.mocked(fetchVoiceCatalog).mockReset();
+  vi.mocked(fetchVoiceCatalog).mockResolvedValue({
+    provider: "qwen",
+    model: "qwen3-tts-flash",
+    voices: [
+      { value: "auto", label: "自动匹配" },
+      { value: "Chelsie", label: "Chelsie" },
+    ],
+  });
 });
 
 describe("JobForm", () => {
@@ -109,6 +119,14 @@ describe("JobForm", () => {
 
     await waitFor(() => {
       expect(pushMock).toHaveBeenCalledWith("/jobs/job-123");
+    });
+  });
+
+  it("shows the current voice catalog source on the home page", async () => {
+    render(<HomePage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("当前音色目录：qwen / qwen3-tts-flash")).toBeInTheDocument();
     });
   });
 

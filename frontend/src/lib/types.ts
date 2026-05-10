@@ -38,3 +38,9 @@ export type VoiceOption = {
   value: string;
   label: string;
 };
+
+export type VoiceCatalog = {
+  provider: string;
+  model: string;
+  voices: VoiceOption[];
+};
