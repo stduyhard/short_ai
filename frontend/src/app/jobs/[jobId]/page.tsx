@@ -25,6 +25,15 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
       <JobStageList stages={job.stages} />
 
       <section>
+        <h2>生成参数</h2>
+        <p>音色：{job.voiceSelection}</p>
+        <p>时长：{job.duration}s</p>
+        <p>分镜数量：{job.shotCount}</p>
+        <p>字幕：{job.subtitlesEnabled ? "开启" : "关闭"}</p>
+        <p>画幅：{job.aspectRatio}</p>
+      </section>
+
+      <section>
         <h2>创意 Brief</h2>
         <p>{job.brief ?? "暂未生成"}</p>
       </section>

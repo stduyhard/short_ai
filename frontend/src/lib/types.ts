@@ -12,6 +12,11 @@ export type JobDetail = {
   jobId: string;
   topic: string;
   style: string;
+  voiceSelection: string;
+  duration: number;
+  shotCount: number;
+  subtitlesEnabled: boolean;
+  aspectRatio: string;
   status: JobStatus;
   stages: JobStage[];
   brief?: string | null;
@@ -32,6 +37,9 @@ export type CreateJobInput = {
   topic: string;
   style: string;
   voice: string;
+  duration: 15 | 30 | 60;
+  shotCount: 3 | 5 | 7;
+  subtitlesEnabled: boolean;
 };
 
 export type VoiceOption = {

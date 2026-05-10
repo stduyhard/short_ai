@@ -65,6 +65,9 @@ describe("JobForm", () => {
       topic: "春节旅行攻略",
       style: "轻松口播",
       voice: "auto",
+      duration: 30,
+      shotCount: 5,
+      subtitlesEnabled: true,
     });
   });
 
@@ -88,6 +91,9 @@ describe("JobForm", () => {
       topic: "春节旅行攻略",
       style: "轻松口播",
       voice: "Chelsie",
+      duration: 30,
+      shotCount: 5,
+      subtitlesEnabled: true,
     });
   });
 
@@ -107,6 +113,9 @@ describe("JobForm", () => {
     fireEvent.change(screen.getByLabelText("风格"), {
       target: { value: "轻松口播" },
     });
+    fireEvent.click(screen.getByRole("button", { name: "60s" }));
+    fireEvent.click(screen.getByRole("button", { name: "7 镜头" }));
+    fireEvent.click(screen.getByRole("switch", { name: "字幕" }));
     fireEvent.click(screen.getByRole("button", { name: "开始生成" }));
 
     await waitFor(() => {
@@ -114,6 +123,9 @@ describe("JobForm", () => {
         topic: "春节旅行攻略",
         style: "轻松口播",
         voice: "auto",
+        duration: 60,
+        shotCount: 7,
+        subtitlesEnabled: false,
       });
     });
 
@@ -148,5 +160,17 @@ describe("JobForm", () => {
     });
 
     expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it("renders the homepage workbench layout", async () => {
+    render(<HomePage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("AI 短视频工作台")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("视频基础参数")).toBeInTheDocument();
+    expect(screen.getByText("运行状态")).toBeInTheDocument();
+    expect(screen.getByText("当前音色目录：qwen / qwen3-tts-flash")).toBeInTheDocument();
   });
 });
