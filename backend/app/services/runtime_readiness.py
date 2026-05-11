@@ -36,6 +36,7 @@ def _providers_are_configured(settings: Settings) -> bool:
             _provider_is_configured(settings.llm_provider, openai_api_key=settings.openai_api_key, dashscope_api_key=settings.dashscope_api_key),
             _provider_is_configured(settings.image_provider, openai_api_key=settings.openai_api_key, dashscope_api_key=settings.dashscope_api_key),
             _provider_is_configured(settings.tts_provider, openai_api_key=settings.openai_api_key, dashscope_api_key=settings.dashscope_api_key),
+            _provider_is_configured(settings.video_provider, openai_api_key=settings.openai_api_key, dashscope_api_key=settings.dashscope_api_key),
         ]
     )
 

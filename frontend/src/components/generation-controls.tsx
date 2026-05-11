@@ -9,6 +9,7 @@ type GenerationControlsProps = {
   onDurationChange: (value: 15 | 30 | 60) => void;
   onShotCountChange: (value: 3 | 5 | 7) => void;
   onSubtitlesEnabledChange: (value: boolean) => void;
+  disabled?: boolean;
 };
 
 const DURATIONS = [15, 30, 60] as const;
@@ -21,6 +22,7 @@ export function GenerationControls({
   onDurationChange,
   onShotCountChange,
   onSubtitlesEnabledChange,
+  disabled = false,
 }: GenerationControlsProps) {
   return (
     <section className="workbench-card control-card" aria-label="视频基础参数">
@@ -35,6 +37,7 @@ export function GenerationControls({
             <button
               key={value}
               className="pill-button"
+              disabled={disabled}
               type="button"
               aria-pressed={duration === value}
               onClick={() => onDurationChange(value)}
@@ -57,6 +60,7 @@ export function GenerationControls({
             <button
               key={value}
               className="pill-button"
+              disabled={disabled}
               type="button"
               aria-pressed={shotCount === value}
               onClick={() => onShotCountChange(value)}
@@ -73,6 +77,7 @@ export function GenerationControls({
           <input
             aria-label="字幕"
             checked={subtitlesEnabled}
+            disabled={disabled}
             onChange={(event) => onSubtitlesEnabledChange(event.target.checked)}
             role="switch"
             type="checkbox"

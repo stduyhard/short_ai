@@ -38,6 +38,10 @@ def test_langgraph_workflow_runs_all_six_stages_in_order() -> None:
     assert result["script"]
     assert result["storyboard"]
     assert result["visual_assets"]
+    assert len(result["visual_assets"]) == 5
+    assert result["video_segments"]
+    assert len(result["video_segments"]) == 5
+    assert result["segment_duration_seconds"] == 6.0
     assert result["voice_asset"].endswith((".mp3", ".wav"))
     assert result["final_video"] == ""
     assert result["final_status"] == "degraded"
@@ -72,3 +76,6 @@ def test_langgraph_workflow_preserves_generation_controls() -> None:
     assert result["subtitles_enabled"] is False
     assert result["aspect_ratio"] == "9:16"
     assert len(result["storyboard"]) == 3
+    assert len(result["visual_assets"]) == 3
+    assert len(result["video_segments"]) == 3
+    assert result["segment_duration_seconds"] == 5.0

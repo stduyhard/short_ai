@@ -15,5 +15,8 @@ __pycache__/
 backend/.env
 frontend/.env.local
 tmp/
+tmp_ref_frames/
 artifacts/
 .superpowers/
+backend/*.log
+backend/debug_*.json

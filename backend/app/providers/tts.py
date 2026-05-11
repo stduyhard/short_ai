@@ -96,12 +96,14 @@ class QwenTTSProvider:
             headers={
                 "Authorization": f"Bearer {self._api_key}",
                 "Content-Type": "application/json",
-                "X-DashScope-Async": "false",
             },
             json={
                 "model": self._model,
-                "input": {"text": request.text, "voice": voice},
-                "parameters": {"format": "mp3"},
+                "input": {
+                    "text": request.text,
+                    "voice": voice,
+                    "language_type": "Chinese",
+                },
             },
             timeout=120.0,
         )

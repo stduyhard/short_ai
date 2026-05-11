@@ -15,7 +15,7 @@ def test_list_available_voices_returns_qwen_catalog_for_qwen_tts_model() -> None
     assert catalog["voices"] == [
         {"value": "auto", "label": "自动匹配"},
         {"value": "Chelsie", "label": "Chelsie"},
-        {"value": "Serena", "label": "Serena"},
+        {"value": "Seren", "label": "Seren"},
         {"value": "Ethan", "label": "Ethan"},
         {"value": "Dylan", "label": "Dylan"},
     ]

@@ -1,5 +1,5 @@
 param(
-    [int]$BackendPort = 8000,
+    [int]$BackendPort = 8001,
     [int]$FrontendPort = 3000
 )
 
@@ -15,18 +15,51 @@ if (-not (Test-Path $frontendRoot)) {
     throw "Frontend directory not found: $frontendRoot"
 }
 
+function Stop-ListeningProcessByPort {
+    param(
+        [Parameter(Mandatory = $true)]
+        [int]$Port
+    )
+
+    $connections = @(Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
+    if ($connections.Count -eq 0) {
+        Write-Host "Port $Port is available."
+        return
+    }
+
+    $processIds = $connections |
+        Select-Object -ExpandProperty OwningProcess -Unique |
+        Where-Object { $_ -and $_ -gt 0 }
+
+    foreach ($processId in $processIds) {
+        try {
+            Stop-Process -Id $processId -Force -ErrorAction Stop
+            Write-Host "Closed process $processId using port $Port."
+        }
+        catch {
+            throw "Failed to stop process $processId on port $Port. $($_.Exception.Message)"
+        }
+    }
+
+    Start-Sleep -Seconds 1
+}
+
+Stop-ListeningProcessByPort -Port $BackendPort
+Stop-ListeningProcessByPort -Port $FrontendPort
+
 $backendCommand = "Set-Location '$backendRoot'; python -m uvicorn app.main:app --reload --host 127.0.0.1 --port $BackendPort"
 $frontendCommand = "Set-Location '$frontendRoot'; `$env:NEXT_PUBLIC_API_BASE_URL='http://127.0.0.1:$BackendPort'; npm run dev -- --hostname 127.0.0.1 --port $FrontendPort"
 
 $backendProcess = Start-Process -FilePath "powershell" -ArgumentList "-NoExit", "-Command", $backendCommand -PassThru
+$frontendProcess = Start-Process -FilePath "powershell" -ArgumentList "-NoExit", "-Command", $frontendCommand -PassThru
 
-try {
-    Write-Host "Backend started in a new PowerShell window: http://127.0.0.1:$BackendPort"
-    Write-Host "Starting frontend in the current window: http://127.0.0.1:$FrontendPort"
-    Invoke-Expression $frontendCommand
+if ($null -eq $backendProcess -or $backendProcess.HasExited) {
+    throw "Backend window failed to start."
 }
-finally {
-    if ($null -ne $backendProcess -and -not $backendProcess.HasExited) {
-        Stop-Process -Id $backendProcess.Id
-    }
+
+if ($null -eq $frontendProcess -or $frontendProcess.HasExited) {
+    throw "Frontend window failed to start."
 }
+
+Write-Host "Backend started in a new PowerShell window: http://127.0.0.1:$BackendPort"
+Write-Host "Frontend started in a new PowerShell window: http://127.0.0.1:$FrontendPort"

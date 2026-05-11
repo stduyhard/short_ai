@@ -4,6 +4,7 @@ import base64
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal, Mapping, Protocol
+from urllib.parse import urlparse
 
 import httpx
 from openai import OpenAI
@@ -113,6 +114,12 @@ class QwenImageProvider:
         self._storage_provider = storage_provider
 
     def generate(self, request: ImageRequest) -> ImageResponse:
+        if self._model.startswith("qwen-image-2."):
+            return self._generate_qwen_image_2(request)
+
+        return self._generate_legacy_qwen_image(request)
+
+    def _generate_legacy_qwen_image(self, request: ImageRequest) -> ImageResponse:
         response = httpx.post(
             f"{self._base_url}/services/aigc/text2image/image-synthesis",
             headers={
@@ -130,10 +137,43 @@ class QwenImageProvider:
         response.raise_for_status()
         payload = response.json()
         image_url = _extract_qwen_image_url(payload)
+        return self._store_generated_image(image_url=image_url, request=request)
+
+    def _generate_qwen_image_2(self, request: ImageRequest) -> ImageResponse:
+        response = httpx.post(
+            f"{self._base_url}/services/aigc/multimodal-generation/generation",
+            headers={
+                "Authorization": f"Bearer {self._api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": self._model,
+                "input": {
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "text": request.prompt,
+                                }
+                            ],
+                        }
+                    ]
+                },
+                "parameters": {"size": request.size.replace("x", "*")},
+            },
+            timeout=120.0,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        image_url = _extract_qwen_image_2_url(payload)
+        return self._store_generated_image(image_url=image_url, request=request)
+
+    def _store_generated_image(self, *, image_url: str, request: ImageRequest) -> ImageResponse:
         image_response = httpx.get(image_url, timeout=120.0)
         image_response.raise_for_status()
         job_id = request.metadata.get("job_id", "adhoc")
-        target_name = Path(image_url).name or "generated.png"
+        target_name = Path(urlparse(image_url).path).name or "generated.png"
         stored = self._storage_provider.save_bytes(
             path=f"images/{job_id}/{target_name}",
             content=image_response.content,
@@ -157,3 +197,25 @@ def _extract_qwen_image_url(payload: Mapping[str, object]) -> str:
                 return url
 
     raise ValueError("Qwen image generation returned no image URL")
+
+
+def _extract_qwen_image_2_url(payload: Mapping[str, object]) -> str:
+    output = payload.get("output")
+    if not isinstance(output, Mapping):
+        raise ValueError("Qwen image generation returned no output payload")
+
+    choices = output.get("choices")
+    if isinstance(choices, list) and choices:
+        first_choice = choices[0]
+        if isinstance(first_choice, Mapping):
+            message = first_choice.get("message")
+            if isinstance(message, Mapping):
+                content = message.get("content")
+                if isinstance(content, list):
+                    for item in content:
+                        if isinstance(item, Mapping):
+                            image = item.get("image")
+                            if isinstance(image, str) and image:
+                                return image
+
+    raise ValueError("Qwen image 2 generation returned no image URL")

@@ -1,7 +1,12 @@
+from datetime import datetime, timezone
+from typing import cast
 from uuid import uuid4
 
-from app.core.models import CreateJobRequest, JobDetailResponse, JobResponse, JobStageResponse
+from app.core.config import settings
+from app.core.models import CreateJobRequest, JobDetailResponse, JobResponse, JobStageResponse, RecentJobResponse
+from app.observability.langsmith import maybe_traceable, maybe_tracing_context
 from app.workflows.graph import build_graph
+from app.workflows.state import WorkflowState
 
 
 DEFAULT_STAGES = [
@@ -25,6 +30,7 @@ class JobService:
             jobId=job_id,
             topic=payload.topic,
             style=payload.style,
+            createdAt=datetime.now(timezone.utc).isoformat(),
             voiceSelection=payload.voice,
             duration=payload.duration,
             shotCount=payload.shotCount,
@@ -56,6 +62,20 @@ class JobService:
     def get_job(self, job_id: str) -> JobDetailResponse | None:
         return self._jobs.get(job_id)
 
+    def list_recent_jobs(self, *, limit: int = 10) -> list[RecentJobResponse]:
+        jobs = list(self._jobs.values())
+        jobs.sort(key=lambda job: job.createdAt or "", reverse=True)
+        return [
+            RecentJobResponse(
+                jobId=job.jobId,
+                topic=job.topic,
+                style=job.style,
+                status=job.status,
+                createdAt=job.createdAt or "",
+            )
+            for job in jobs[:limit]
+        ]
+
     def run_job(self, job_id: str) -> JobDetailResponse | None:
         job = self._jobs.get(job_id)
         if job is None:
@@ -66,26 +86,8 @@ class JobService:
             stage.status = "pending"
 
         try:
-            workflow_result = self._workflow.invoke(
-                {
-                    "job_id": job.jobId,
-                    "topic": job.topic,
-                    "style": job.style,
-                    "voice_selection": job.voiceSelection,
-                    "duration": job.duration,
-                    "shot_count": job.shotCount,
-                    "subtitles_enabled": job.subtitlesEnabled,
-                    "aspect_ratio": job.aspectRatio,
-                    "stages": [],
-                    "brief": "",
-                    "script": "",
-                    "storyboard": [],
-                    "visual_assets": [],
-                    "voice_asset": "",
-                    "final_video": "",
-                    "final_status": "running",
-                }
-            )
+            with maybe_tracing_context(settings, project_name=settings.langsmith_project):
+                workflow_result = self._invoke_workflow_with_tracing(job)
         except Exception as exc:
             job.status = "failed"
             job.errorMessage = str(exc)
@@ -100,6 +102,7 @@ class JobService:
         job.script = workflow_result.get("script")
         job.storyboard = workflow_result.get("storyboard")
         job.visualAssets = workflow_result.get("visual_assets")
+        job.videoSegments = workflow_result.get("video_segments")
         job.voiceAsset = workflow_result.get("voice_asset")
         job.finalVideo = workflow_result.get("final_video")
         job.duration = workflow_result.get("duration", job.duration)
@@ -122,3 +125,31 @@ class JobService:
             "stage": stage_key,
             "status": "accepted",
         }
+
+    @maybe_traceable(settings, name="generate-video-job", run_type="chain")
+    def _invoke_workflow_with_tracing(self, job: JobDetailResponse) -> WorkflowState:
+        return cast(
+            WorkflowState,
+            self._workflow.invoke(
+            {
+                "job_id": job.jobId,
+                "topic": job.topic,
+                "style": job.style,
+                "voice_selection": job.voiceSelection,
+                "duration": job.duration,
+                "shot_count": job.shotCount,
+                "subtitles_enabled": job.subtitlesEnabled,
+                "aspect_ratio": job.aspectRatio,
+                "stages": [],
+                "brief": "",
+                "script": "",
+                "storyboard": [],
+                "visual_assets": [],
+                "video_segments": [],
+                "segment_duration_seconds": 0.0,
+                "voice_asset": "",
+                "final_video": "",
+                "final_status": "running",
+            }
+            ),
+        )

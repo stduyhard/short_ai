@@ -1,9 +1,19 @@
+from app.core.config import Settings
 from app.services.voice_selection import resolve_voice_selection
+from app.observability.langsmith import maybe_traceable
 from app.providers.tts import TTSProvider, TTSRequest
 from app.workflows.state import WorkflowState
 
 
-def build_voice_node(tts_provider: TTSProvider, *, default_voice: str):
+def build_voice_node(
+    tts_provider: TTSProvider,
+    *,
+    default_voice: str,
+    current_settings: Settings | None = None,
+):
+    effective_settings = current_settings or Settings()
+
+    @maybe_traceable(effective_settings, name="voice", run_type="chain")
     def run_voice(state: WorkflowState) -> WorkflowState:
         selected_voice = resolve_voice_selection(
             style=state["style"],

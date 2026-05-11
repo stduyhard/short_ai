@@ -1,8 +1,13 @@
+from app.core.config import Settings
+from app.observability.langsmith import maybe_traceable
 from app.providers.llm import LLMProvider, LLMRequest
 from app.workflows.state import WorkflowState
 
 
-def build_director_node(llm_provider: LLMProvider):
+def build_director_node(llm_provider: LLMProvider, current_settings: Settings | None = None):
+    effective_settings = current_settings or Settings()
+
+    @maybe_traceable(effective_settings, name="director", run_type="chain")
     def run_director(state: WorkflowState) -> WorkflowState:
         response = llm_provider.generate(
             LLMRequest(

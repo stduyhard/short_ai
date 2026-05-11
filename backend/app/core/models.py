@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class CreateJobRequest(BaseModel):
@@ -10,6 +10,14 @@ class CreateJobRequest(BaseModel):
     duration: Literal[15, 30, 60] = 30
     shotCount: Literal[3, 5, 7] = 5
     subtitlesEnabled: bool = True
+
+    @field_validator("topic", "style")
+    @classmethod
+    def validate_required_text(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("is required")
+        return normalized
 
 
 class JobResponse(BaseModel):
@@ -30,10 +38,19 @@ class JobStageResponse(BaseModel):
     status: str
 
 
+class RecentJobResponse(BaseModel):
+    jobId: str
+    topic: str
+    style: str
+    status: str
+    createdAt: str
+
+
 class JobDetailResponse(BaseModel):
     jobId: str
     topic: str
     style: str
+    createdAt: str | None = None
     voiceSelection: str = "auto"
     duration: int = 30
     shotCount: int = 5
@@ -45,6 +62,7 @@ class JobDetailResponse(BaseModel):
     script: str | None = None
     storyboard: list[dict[str, str]] | None = None
     visualAssets: list[str] | None = None
+    videoSegments: list[str] | None = None
     voiceAsset: str | None = None
     finalVideo: str | None = None
     errorMessage: str | None = None

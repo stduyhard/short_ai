@@ -12,6 +12,7 @@ export type JobDetail = {
   jobId: string;
   topic: string;
   style: string;
+  createdAt?: string | null;
   voiceSelection: string;
   duration: number;
   shotCount: number;
@@ -26,11 +27,20 @@ export type JobDetail = {
     caption: string;
   }> | null;
   visualAssets?: string[] | null;
+  videoSegments?: string[] | null;
   voiceAsset?: string | null;
   finalVideo?: string | null;
   errorMessage?: string | null;
   previewUrl?: string;
   finalVideoUrl?: string;
+};
+
+export type RecentJob = {
+  jobId: string;
+  topic: string;
+  style: string;
+  status: JobStatus;
+  createdAt: string;
 };
 
 export type CreateJobInput = {
@@ -51,4 +61,10 @@ export type VoiceCatalog = {
   provider: string;
   model: string;
   voices: VoiceOption[];
+};
+
+export type RuntimeReadiness = {
+  providersConfigured: boolean;
+  ffmpegAvailable: boolean;
+  readyForRealGeneration: boolean;
 };

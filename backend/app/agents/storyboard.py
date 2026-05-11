@@ -1,8 +1,14 @@
+from app.core.config import Settings
+from app.observability.langsmith import maybe_traceable
 from app.providers.llm import LLMProvider, LLMRequest
+from app.services.storyboard_parser import build_storyboard_shots
 from app.workflows.state import WorkflowState
 
 
-def build_storyboard_node(llm_provider: LLMProvider):
+def build_storyboard_node(llm_provider: LLMProvider, current_settings: Settings | None = None):
+    effective_settings = current_settings or Settings()
+
+    @maybe_traceable(effective_settings, name="storyboard", run_type="chain")
     def run_storyboard(state: WorkflowState) -> WorkflowState:
         response = llm_provider.generate(
             LLMRequest(
@@ -16,10 +22,7 @@ def build_storyboard_node(llm_provider: LLMProvider):
         return {
             **state,
             "stages": [*state["stages"], "storyboard"],
-            "storyboard": [
-                {"shot": str(index + 1), "caption": f"{response.content} #{index + 1}"}
-                for index in range(state["shot_count"])
-            ],
+            "storyboard": build_storyboard_shots(response.content, state["shot_count"]),
         }
 
     return run_storyboard

@@ -5,6 +5,7 @@ from app.providers.image import ImageProvider, OpenAIImageProvider, QwenImagePro
 from app.providers.llm import LLMProvider, OpenAILLMProvider, QwenLLMProvider, StubLLMProvider
 from app.providers.storage import StorageProvider
 from app.providers.tts import OpenAITTSProvider, QwenTTSProvider, StubTTSProvider, TTSProvider
+from app.providers.video import QwenVideoProvider, StubVideoProvider, VideoProvider
 
 
 def build_llm_provider(settings: Settings) -> LLMProvider:
@@ -75,6 +76,23 @@ def build_tts_provider(settings: Settings) -> TTSProvider:
             base_url=_dashscope_api_base_url(settings.dashscope_base_url),
         )
     raise ValueError(f"Unsupported TTS provider: {settings.tts_provider}")
+
+
+def build_video_provider(*, settings: Settings, storage_provider: StorageProvider) -> VideoProvider:
+    if settings.video_provider == "stub":
+        return StubVideoProvider(storage_provider)
+    if settings.video_provider == "openai":
+        raise ValueError("OpenAI video provider is not implemented")
+    if settings.video_provider == "qwen":
+        if not settings.dashscope_api_key:
+            raise ValueError("DASHSCOPE_API_KEY is required when VIDEO_PROVIDER=qwen")
+        return QwenVideoProvider(
+            api_key=settings.dashscope_api_key,
+            model=settings.video_model,
+            base_url=_dashscope_api_base_url(settings.dashscope_base_url),
+            storage_provider=storage_provider,
+        )
+    raise ValueError(f"Unsupported video provider: {settings.video_provider}")
 
 
 def _dashscope_api_base_url(compatible_base_url: str) -> str:

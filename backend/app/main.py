@@ -4,7 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from app.core.config import settings
-from app.core.models import CreateJobRequest, JobDetailResponse, JobResponse
+from app.core.models import CreateJobRequest, JobDetailResponse, JobResponse, RecentJobResponse
+from app.observability.langsmith import inspect_langsmith_runtime
 from app.services.job_service import JobService
 from app.services.runtime_readiness import inspect_runtime_readiness
 from app.services.voice_catalog import list_available_voices
@@ -50,6 +51,11 @@ def get_runtime_readiness() -> dict[str, bool]:
     return inspect_runtime_readiness(settings).to_response()
 
 
+@app.get("/api/runtime/langsmith")
+def get_langsmith_runtime() -> dict[str, object]:
+    return inspect_langsmith_runtime(settings)
+
+
 @app.get("/api/voices")
 def get_available_voices() -> dict[str, object]:
     return list_available_voices(settings)
@@ -58,6 +64,11 @@ def get_available_voices() -> dict[str, object]:
 @app.post("/api/jobs", response_model=JobResponse, status_code=201)
 def create_job(payload: CreateJobRequest) -> JobResponse:
     return job_service.create_job(payload)
+
+
+@app.get("/api/jobs", response_model=list[RecentJobResponse])
+def list_recent_jobs() -> list[RecentJobResponse]:
+    return job_service.list_recent_jobs()
 
 
 @app.get("/api/jobs/{job_id}", response_model=JobDetailResponse)

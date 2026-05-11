@@ -10,7 +10,7 @@ VoiceOption = dict[str, str]
 DEFAULT_VOICE_OPTIONS: list[VoiceOption] = [
     {"value": "auto", "label": "自动匹配"},
     {"value": "Chelsie", "label": "Chelsie"},
-    {"value": "Serena", "label": "Serena"},
+    {"value": "Seren", "label": "Seren"},
     {"value": "Ethan", "label": "Ethan"},
     {"value": "Dylan", "label": "Dylan"},
 ]
@@ -22,7 +22,7 @@ VOICE_CATALOGS: dict[tuple[str, str], list[VoiceOption]] = {
     ): [
         {"value": "auto", "label": "自动匹配"},
         {"value": "Chelsie", "label": "Chelsie"},
-        {"value": "Serena", "label": "Serena"},
+        {"value": "Seren", "label": "Seren"},
         {"value": "Ethan", "label": "Ethan"},
         {"value": "Dylan", "label": "Dylan"},
     ],
